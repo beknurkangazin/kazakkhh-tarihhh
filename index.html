@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XIX ғ. 60-90 жж. Көші-қон саясаты — Жоба сайты</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0b132b;
+      --bg-side: #1c2541;
+      --card-bg: #1e293b;
+      --accent-gold: #f59e0b;
+      --accent-cyan: #38bdf8;
+      --text-light: #f8fafc;
+      --text-gray: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-light); display: flex; min-height: 100vh; overflow-x: hidden; }
+
+    /* Sidebar */
+    .sidebar { width: 270px; background-color: var(--bg-side); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; overflow-y: auto; }
+    .sidebar-header { padding: 20px; font-size: 1.1rem; font-weight: bold; color: var(--accent-gold); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-color); }
+    .sidebar-menu { list-style: none; padding: 15px 0; }
+    .sidebar-menu li { margin-bottom: 5px; }
+    .sidebar-menu a { display: flex; align-items: center; gap: 15px; padding: 12px 20px; color: var(--text-gray); text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: all 0.3s ease; cursor: pointer; }
+    .sidebar-menu a:hover, .sidebar-menu a.active { color: var(--text-light); background-color: rgba(56, 189, 248, 0.1); border-left: 4px solid var(--accent-cyan); }
+    .sidebar-menu a i { font-size: 1.1rem; width: 20px; }
+
+    /* Main content */
+    .main-content { margin-left: 270px; flex: 1; padding: 30px; max-width: 1250px; }
+    .section { display: none; animation: fadeIn 0.4s ease-in-out; }
+    .section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .header-box { background: linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.95)); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .header-box h1 { color: var(--accent-cyan); font-size: 1.8rem; margin-bottom: 10px; }
+    .header-box p { color: var(--text-gray); line-height: 1.6; }
+
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: transform 0.3s ease, border-color 0.3s ease; }
+    .card:hover { transform: translateY(-5px); border-color: var(--accent-gold); }
+    .card h3 { color: var(--accent-gold); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+    .card p { color: var(--text-gray); font-size: 0.95rem; line-height: 1.5; }
+
+    /* Аймақтар панелі */
+    .map-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; align-items: center; }
+    .map-points-container {
+      position: relative; background: #0f172a; border-radius: 12px; min-height: 350px; border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; gap: 15px;
+    }
+    .points-list { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .point-btn { background: var(--bg-side); border: 1px solid var(--border-color); color: var(--text-light); padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+    .point-btn i { color: var(--accent-gold); }
+    .point-btn:hover, .point-btn.active { background: rgba(56, 189, 248, 0.15); border-color: var(--accent-cyan); color: var(--accent-cyan); }
+    .point-btn.active i { color: var(--accent-cyan); }
+
+    .map-info-card { background: rgba(11, 19, 43, 0.95); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; min-height: 350px; }
+    .map-info-card h3 { color: var(--accent-gold); margin-bottom: 12px; font-size: 1.3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    .stat-badge { display: inline-block; background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; margin-bottom: 12px; }
+    .map-info-card p { color: var(--text-gray); font-size: 0.95rem; line-height: 1.6; margin-bottom: 10px; }
+
+    /* Уақыт шкаласы */
+    .timeline { position: relative; padding-left: 30px; border-left: 2px solid var(--accent-cyan); margin: 20px 0; }
+    .timeline-item { position: relative; margin-bottom: 25px; background: var(--card-bg); padding: 15px 20px; border-radius: 10px; border: 1px solid var(--border-color); }
+    .timeline-item::before { content: ''; position: absolute; left: -37px; top: 15px; width: 12px; height: 12px; background: var(--accent-gold); border-radius: 50%; border: 2px solid var(--bg-main); }
+    .timeline-item h4 { color: var(--accent-gold); margin-bottom: 5px; }
+    .timeline-item p { color: var(--text-gray); font-size: 0.9rem; }
+
+    /* Тұлғалар */
+    .person-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .person-card-text { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+    .person-card-text:hover { transform: translateY(-5px); border-color: var(--accent-gold); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+    .person-icon { width: 50px; height: 50px; background: rgba(245, 158, 11, 0.15); color: var(--accent-gold); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+    .person-card-text h4 { color: var(--accent-cyan); font-size: 1.2rem; }
+    .person-card-text span { color: var(--accent-gold); font-size: 0.85rem; font-weight: bold; background: rgba(245, 158, 11, 0.1); padding: 4px 10px; border-radius: 6px; }
+    .person-card-text p { color: var(--text-gray); font-size: 0.9rem; line-height: 1.4; }
+
+    /* Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-content { background: var(--bg-side); border: 1px solid var(--border-color); padding: 30px; border-radius: 16px; max-width: 500px; width: 90%; position: relative; }
+    .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: var(--text-gray); cursor: pointer; }
+    .close-btn:hover { color: white; }
+
+    /* Терминдер */
+    .search-box { width: 100%; padding: 12px 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 1rem; margin-bottom: 20px; }
+    .glossary-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+    .glossary-item { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .glossary-item h4 { color: var(--accent-cyan); margin-bottom: 5px; }
+    .glossary-item p { color: var(--text-gray); font-size: 0.9rem; }
+
+    /* Бейневидеолар */
+    .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .video-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    .video-info { padding: 15px; }
+    .video-info h4 { color: var(--text-light); margin-bottom: 5px; font-size: 1rem; }
+    .video-info p { color: var(--text-gray); font-size: 0.85rem; }
+
+    /* Тест & Аналитика */
+    .quiz-container { background: var(--card-bg); padding: 30px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 30px; }
+    .input-group { margin-bottom: 20px; }
+    .input-group label { display: block; margin-bottom: 8px; color: var(--accent-cyan); }
+    .input-group input, .input-group select, .question-box textarea { width: 100%; padding: 12px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 1rem; }
+    .btn { background: linear-gradient(90deg, var(--accent-cyan), #0284c7); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: opacity 0.3s; }
+    .btn:hover { opacity: 0.9; }
+    
+    .question-box { margin-bottom: 25px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 10px; border: 1px solid var(--border-color); }
+    .question-box h4 { margin-bottom: 12px; color: var(--accent-gold); line-height: 1.4; }
+    .question-tag { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; margin-left: 8px; text-transform: uppercase; }
+    .tag-single { background: rgba(56, 189, 248, 0.2); color: var(--accent-cyan); }
+    .tag-multi { background: rgba(245, 158, 11, 0.2); color: var(--accent-gold); }
+    .tag-open { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+
+    .options label { display: block; padding: 10px 15px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: background 0.2s; font-size: 0.95rem; }
+    .options label:hover { background: rgba(56, 189, 248, 0.1); }
+    .options input { margin-right: 10px; }
+
+    .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .analytic-card { background: var(--bg-side); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; text-align: center; }
+    .analytic-card h3 { color: var(--accent-cyan); font-size: 1.8rem; margin-bottom: 5px; }
+    .analytic-card p { color: var(--text-gray); font-size: 0.9rem; }
+
+    .table-container { margin-top: 20px; max-height: 450px; overflow-y: auto; background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); }
+    th { background: var(--bg-side); color: var(--accent-cyan); position: sticky; top: -20px; z-index: 10; }
+    td { color: var(--text-gray); font-size: 0.95rem; }
+
+    /* Интерактивті Ойындар стилі */
+    .game-tab-btn { background: var(--bg-side); border: 1px solid var(--border-color); color: var(--text-light); padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; margin-right: 8px; margin-bottom: 12px; }
+    .game-tab-btn.active, .game-tab-btn:hover { background: rgba(56, 189, 248, 0.2); border-color: var(--accent-cyan); color: var(--accent-cyan); }
+    .game-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; margin-top: 15px; }
+    
+    /* Flip Card Game */
+    .flip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+    .flip-card { background-color: transparent; width: 100%; height: 140px; perspective: 1000px; cursor: pointer; }
+    .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+    .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 12px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; padding: 15px; font-weight: bold; }
+    .flip-card-front { background: var(--bg-side); color: var(--accent-gold); font-size: 1.1rem; }
+    .flip-card-back { background: rgba(56, 189, 248, 0.15); color: var(--text-light); transform: rotateY(180deg); border-color: var(--accent-cyan); font-size: 0.9rem; font-weight: normal; line-height: 1.4; }
+
+    /* Game feedback */
+    .game-feedback { margin-top: 15px; padding: 12px; border-radius: 8px; font-weight: bold; display: none; }
+    .feedback-success { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+    .feedback-error { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+
+    @media (max-width: 900px) { .map-wrapper { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+      .sidebar { width: 70px; }
+      .sidebar-header span, .sidebar-menu span { display: none; }
+      .main-content { margin-left: 70px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header"><i class="fa-solid fa-landmark"></i><span>Тарих Жобасы</span></div>
+    <ul class="sidebar-menu">
+      <li><a onclick="showSection('home')" class="active" id="nav-home"><i class="fa-solid fa-house"></i><span>Басты бет</span></a></li>
+      <li><a onclick="showSection('map-sec')" id="nav-map-sec"><i class="fa-solid fa-map-location-dot"></i><span>Аймақтар & Меткілер</span></a></li>
+      <li><a onclick="showSection('timeline-sec')" id="nav-timeline-sec"><i class="fa-solid fa-timeline"></i><span>Уақыт Шкаласы</span></a></li>
+      <li><a onclick="showSection('persons-sec')" id="nav-persons-sec"><i class="fa-solid fa-users"></i><span>Тарихи Тұлғалар</span></a></li>
+      <li><a onclick="showSection('glossary-sec')" id="nav-glossary-sec"><i class="fa-solid fa-book"></i><span>Терминдер</span></a></li>
+      <li><a onclick="showSection('videos')" id="nav-videos"><i class="fa-solid fa-video"></i><span>Бейневидеолар</span></a></li>
+      <li><a onclick="showSection('games-sec')" id="nav-games-sec"><i class="fa-solid fa-gamepad"></i><span>Тарихи Ойындар</span></a></li>
+      <li><a onclick="showSection('quiz')" id="nav-quiz"><i class="fa-solid fa-list-check"></i><span>Тест & Сараптама (<span id="total-badge-count">104</span>)</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- Негізгі контент -->
+  <main class="main-content">
+    
+    <!-- 1. Басты бет -->
+    <section id="home" class="section active">
+      <div class="header-box">
+        <h1>XIX ғ. 60-90 жылдарындағы көші-қон мәселесі</h1>
+        <p>Орыс, ұйғыр, дүңген шаруаларын Қазақстан аймақтарына орналастыру ерекшеліктері, орыстандыру саясаты мен бекіністердің салынуы.</p>
+      </div>
+      <div class="grid-cards">
+        <div class="card"><h3><i class="fa-solid fa-users-rectangle"></i> Әлеуметтік құрам</h3><p>Орыс шаруалары, ұйғырлар мен дүңгендердің қоныс аудару себептері[cite: 2].</p></div>
+        <div class="card"><h3><i class="fa-solid fa-shield-halved"></i> Бекіністер жүйесі</h3><p>Отарлау саясатының басты бағыттары және тірек пунктері.</p></div>
+        <div class="card"><h3><i class="fa-solid fa-chart-pie"></i> Талдау панелі</h3><p>Тест нәтижелерін автоматты түрде жинақтап, қателерге сараптама жасайды.</p></div>
+      </div>
+    </section>
+
+    <!-- 2. Аймақтар мен Меткілер -->
+    <section id="map-sec" class="section">
+      <div class="header-box">
+        <h1>Қоныстану аймақтары мен өңірлер</h1>
+        <p>Төмендегі аймақ батырмаларын басып, әрбір өңірдің қоныстану ерекшеліктері туралы мәлімет алыңыз.</p>
+      </div>
+      <div class="map-wrapper">
+        <div class="map-points-container">
+          <p style="color:var(--text-gray); margin-bottom: 10px; font-size: 0.9rem;"><i class="fa-solid fa-hand-pointer"></i> Өңірді таңдаңыз:</p>
+          <div class="points-list">
+            <button class="point-btn active" id="btn-zharkent" onclick="selectMapPoint('zharkent')"><i class="fa-solid fa-location-dot"></i> Жаркент уезі</button>
+            <button class="point-btn" id="btn-verny" onclick="selectMapPoint('verny')"><i class="fa-solid fa-location-dot"></i> Верный уезі</button>
+            <button class="point-btn" id="btn-tokmak" onclick="selectMapPoint('tokmak')"><i class="fa-solid fa-location-dot"></i> Тоқмақ & Пишпек</button>
+            <button class="point-btn" id="btn-syrdarya" onclick="selectMapPoint('syrdarya')"><i class="fa-solid fa-location-dot"></i> Сырдарья облысы</button>
+            <button class="point-btn" id="btn-north" onclick="selectMapPoint('north')"><i class="fa-solid fa-location-dot"></i> Солтүстік Қазақстан</button>
+          </div>
+        </div>
+        <div class="map-info-card" id="map-info"></div>
+      </div>
+    </section>
+
+    <!-- 3. Уақыт шкаласы -->
+    <section id="timeline-sec" class="section">
+      <div class="header-box">
+        <h1>Хронологиялық Уақыт Шкаласы</h1>
+        <p>XIX ғасырдың екінші жартысындағы маңызды тарихи кезеңдер мен реформалар.</p>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item"><h4>1867–1868 жылдар</h4><p>«Жетісу және Сырдария облыстарын басқару туралы Уақытша ережелер» қабылданып, қазақ жерлері мемлекеттік меншік деп жарияланды.</p></div>
+        <div class="timeline-item"><h4>1881 жыл</h4><p>Петербург келісімі[cite: 2]. Құлжа өңірінен ұйғырлар мен дүңгендердің Жетісуға жаппай қоныс аударуы басталды[cite: 2].</p></div>
+        <div class="timeline-item"><h4>1889 жыл</h4><p>Патша үкіметінің «Жетісуға шаруаларды ерікті түрде қоныстандыру туралы» ережесі қабылданды.</p></div>
+        <div class="timeline-item"><h4>1897 жыл</h4><p>Ресей империясының тұңғыш Жалпыресейлік халық санағы өтіп[cite: 2], өңірдегі этностық құрамның күрт өзгергені тіркелді.</p></div>
+      </div>
+    </section>
+
+    <!-- 4. Тарихи Тұлғалар -->
+    <section id="persons-sec" class="section">
+      <div class="header-box">
+        <h1>Тарихи Тұлғалар</h1>
+        <p>Көші-қон саясатында маңызды рөл атқарған тұлғалар. Толық мәлімет алу үшін карточканы басыңыз.</p>
+      </div>
+      <div class="person-grid">
+        <div class="person-card-text" onclick="openModal('Г.А. Колпаковский', 'Жетісу облысының әскери губернаторы, ұйғырлар мен дүңгендерді Жетісуға қоныстандыруды және орыс шаруаларын орналастыруды тікелей басқарған патша шенеунігі.')">
+          <div class="person-icon"><i class="fa-solid fa-user-shield"></i></div>
+          <h4>Г.А. Колпаковский</h4>
+          <span>Әскери губернатор</span>
+          <p>Жетісудағы қоныстандыру саясатын тікелей жүзеге асырушы.</p>
+        </div>
+
+        <div class="person-card-text" onclick="openModal('Вали Ахун Юлдашев', 'Жаркент өңірінің белгілі көпесі әрі қоғам қайраткері. Ол қоныс аударған ұйғыр қауымының шаруашылығын көтеруге, сауда мен егіншілікті дамытуға үлкен үлес қосты.')">
+          <div class="person-icon"><i class="fa-solid fa-user-tie"></i></div>
+          <h4>Вали Ахун Юлдашев</h4>
+          <span>Көпес, қоғам қайраткері</span>
+          <p>Жаркент өңіріндегі сауда мен инфрақұрылымды дамытушы.</p>
+        </div>
+
+        <div class="person-card-text" onclick="openModal('П.А. Столыпин', 'Ресей империясының премьер-министрі. XX ғасырдың басында қазақ жерлеріне ішкі губерниялардан миллиондаған шаруаларды көшіру саясатын (Столыпин аграрлық реформасы) қатаң жүзеге асырды.')">
+          <div class="person-icon"><i class="fa-solid fa-user-gear"></i></div>
+          <h4>П.А. Столыпин</h4>
+          <span>Премьер-министр</span>
+          <p>Аграрлық реформа авторы, жаппай көші-қонды ұйымдастырушы.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal" id="personModal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h3 id="modalTitle" style="color:var(--accent-gold); margin-bottom:15px;"></h3>
+        <p id="modalDesc" style="color:var(--text-gray); line-height:1.6;"></p>
+      </div>
+    </div>
+
+    <!-- 5. Терминдер -->
+    <section id="glossary-sec" class="section">
+      <div class="header-box">
+        <h1>Тарихи Терминдер Сөздігі</h1>
+        <p>Тақырыпта жиі кездесетін ұғымдар мен сөздер тізімі.</p>
+      </div>
+      <input type="text" class="search-box" id="glossarySearch" placeholder="Терминді іздеу..." onkeyup="filterGlossary()">
+      <div class="glossary-list" id="glossaryList">
+        <div class="glossary-item"><h4>Десятина</h4><p>Ресей империясында қолданылған жер өлшем бірлігі (шамамен 1,09 гектар).</p></div>
+        <div class="glossary-item"><h4>Переселендер</h4><p>Ресейдің ішкі губернияларынан шет аймақтарға көшіріліп келген шаруалар.</p></div>
+        <div class="glossary-item"><h4>Уезд</h4><p>Ресей империясындағы әкімшілік-аумақтық бөлініс бірлігі.</p></div>
+        <div class="glossary-item"><h4>Петербург келісімі</h4><p>1881 жылы Ресей мен Қытай арасында жасалып, Құлжа өлкесінен ұйғырлар мен дүңгендердің көшуін заңдастырған шарт[cite: 2].</p></div>
+        <div class="glossary-item"><h4>Жетісу казак әскері</h4><p>Патша үкіметінің отарлау саясатын қорғау үшін Жетісуда құрылған әскери құрылым.</p></div>
+      </div>
+    </section>
+
+    <!-- 6. Бейневидеолар -->
+    <section id="videos" class="section">
+      <div class="header-box">
+        <h1>Жобалық Бейневидеолар</h1>
+        <p>Тақырып бойынша зерттеу және сауалнама видеоматериалдары.</p>
+      </div>
+      <div class="video-grid">
+        <div class="video-card"><div class="video-container"><iframe src="https://www.youtube.com/embed/u_bgE7uO36g" allowfullscreen></iframe></div><div class="video-info"><h4>Патша үкіметінің қоныстандыру саясаты</h4><p>Тарихи талдау видеосы.</p></div></div>
+        <div class="video-card"><div class="video-container"><iframe src="https://www.youtube.com/embed/28YU_NbOODY" allowfullscreen></iframe></div><div class="video-info"><h4>Жаппай отаршылдық қоныс аудару саясаты</h4><p>Отарлаудың салдары.</p></div></div>
+        <div class="video-card"><div class="video-container"><iframe src="https://www.youtube.com/embed/ydyK7avmMP0" allowfullscreen></iframe></div><div class="video-info"><h4>Ұйғырлар мен дүнгендердің Жетісуға қоныс аударуы</h4><p>Этностардың орналасу тарихы.</p></div></div>
+      </div>
+    </section>
+
+    <!-- 7. ИНТЕРАКТИВТІ ТАРИХИ ОЙЫНДАР (5 ТҮРЛІ ОЙЫН) -->
+    <section id="games-sec" class="section">
+      <div class="header-box">
+        <h1>Интерактивті Тарихи Ойындар Панелі</h1>
+        <p>Тақырып бойынша біліміңізді 5 түрлі қызықты ойын форматында тексеріп көріңіз!</p>
+      </div>
+
+      <div>
+        <button class="game-tab-btn active" onclick="switchGame(1)">1. Флеш-карточкалар</button>
+        <button class="game-tab-btn" onclick="switchGame(2)">2. «Кім бұл?» (Тұлғаны тап)</button>
+        <button class="game-tab-btn" onclick="switchGame(3)">3. Хронология</button>
+        <button class="game-tab-btn" onclick="switchGame(4)">4. Тарихи Блиц</button>
+        <button class="game-tab-btn" onclick="switchGame(5)">5. Өңірлер & Этностар</button>
+      </div>
+
+      <!-- ОЙЫН 1: Флеш-карточкалар -->
+      <div id="game-1" class="game-box">
+        <h3 style="color:var(--accent-gold); margin-bottom:15px;"><i class="fa-solid fa-rotate"></i> Тарихи флеш-карточкалар</h3>
+        <p style="color:var(--text-gray); margin-bottom:20px;">Карточканы басу арқылы артындағы тарихи ұғымның анықтамасын ашыңыз:</p>
+        <div class="flip-grid">
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">1881 жылғы Петербург келісімі</div>
+              <div class="flip-card-back">Құлжа өлкесінен ұйғырлар мен дүңгендердің Жетісуға қоныс аударуын заңдастырған халықаралық шарт[cite: 2].</div>
+            </div>
+          </div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">Десятина</div>
+              <div class="flip-card-back">Ресей империясында шаруаларға жер бөлуде қолданылған өлшем бірлігі (1,09 гектар).</div>
+            </div>
+          </div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">Переселендер</div>
+              <div class="flip-card-back">Ішкі Ресей губернияларынан қазақ жеріне қоныстандыру саясатымен көшірілген орыс шаруалары.</div>
+            </div>
+          </div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">1897 жылғы санақ</div>
+              <div class="flip-card-back">Ресей империясының тұңғыш Жалпыресейлік халық санағы[cite: 2], өңір этностарының нақты санын тіркеді.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ОЙЫН 2: Тұлғаны тап -->
+      <div id="game-2" class="game-box" style="display:none;">
+        <h3 style="color:var(--accent-cyan); margin-bottom:15px;"><i class="fa-solid fa-user-secret"></i> «Кім бұл?» (Тарихи тұлғаны анықтау)</h3>
+        <p style="color:var(--text-gray); margin-bottom:15px;"><strong>Сұрақ:</strong> «Жетісу облысының әскери губернаторы болып, ұйғырлар мен дүңгендердің қоныстандырылуын және орыс шаруаларын орналастыруды тікелей басқарған патша шенеунігі кім?»</p>
+        <div class="options">
+          <label><input type="radio" name="g2" value="A"> А) П.А. Столыпин</label>
+          <label><input type="radio" name="g2" value="B"> B) Г.А. Колпаковский</label>
+          <label><input type="radio" name="g2" value="C"> C) Вали Ахун Юлдашев</label>
+        </div>
+        <button class="btn" style="margin-top:10px;" onclick="checkGame2()">Жауапты тексеру</button>
+        <div id="g2-feedback" class="game-feedback"></div>
+      </div>
+
+      <!-- ОЙЫН 3: Хронология -->
+      <div id="game-3" class="game-box" style="display:none;">
+        <h3 style="color:var(--accent-gold); margin-bottom:15px;"><i class="fa-solid fa-arrow-down-1-9"></i> Хронологиялық реттілік ойыны</h3>
+        <p style="color:var(--text-gray); margin-bottom:15px;">1881 жылғы Петербург келісімі қол қойылғаннан кейін қандай оқиға болды?[cite: 2]</p>
+        <div class="options">
+          <label><input type="radio" name="g3" value="A"> А) 1867 жылғы «Уақытша ереже» қабылданды</label>
+          <label><input type="radio" name="g3" value="B"> B) 1889 жылы шаруаларды Жетісуға ерікті түрде көшіру ережесі қабылданды</label>
+          <label><input type="radio" name="g3" value="C"> C) Сырдария бекінісі салынды</label>
+        </div>
+        <button class="btn" style="margin-top:10px;" onclick="checkGame3()">Жауапты тексеру</button>
+        <div id="g3-feedback" class="game-feedback"></div>
+      </div>
+
+      <!-- ОЙЫН 4: Тарихи Блиц -->
+      <div id="game-4" class="game-box" style="display:none;">
+        <h3 style="color:#10b981; margin-bottom:15px;"><i class="fa-solid fa-bolt"></i> Жылдам Тарихи Блиц (Иә / Жоқ)</h3>
+        <p style="color:var(--text-gray); margin-bottom:15px;"><strong>Тұжырым:</strong> «1867–1868 жылдардағы реформа бойынша қазақ жерлері жергілікті қазақ хандарының жеке меншігі деп жарияланды.» Мұндай тұжырым шындыққа жанаса ма?</p>
+        <div class="options">
+          <label><input type="radio" name="g4" value="Иә"> А) Иә, дұрыс</label>
+          <label><input type="radio" name="g4" value="Жоқ"> B) Жоқ, бұл қате (Ресей мемлекеттік меншігі деп жарияланды)</label>
+        </div>
+        <button class="btn" style="margin-top:10px;" onclick="checkGame4()">Жауапты тексеру</button>
+        <div id="g4-feedback" class="game-feedback"></div>
+      </div>
+
+      <!-- ОЙЫН 5: Өңірлер & Этностар -->
+      <div id="game-5" class="game-box" style="display:none;">
+        <h3 style="color:var(--accent-cyan); margin-bottom:15px;"><i class="fa-solid fa-map-pin"></i> Өңірлер мен Этностарды сәйкестендіру</h3>
+        <p style="color:var(--text-gray); margin-bottom:15px;">1881-1884 жылдары Петербург келісімінен кейін Жаркент уезіне негізінен қай этностың өкілдері жаппай қоныстанды?[cite: 2]</p>
+        <div class="options">
+          <label><input type="radio" name="g5" value="A"> А) Негізінен орыс-украин казактары</label>
+          <label><input type="radio" name="g5" value="B"> B) Құлжа өлкесінен ауған Ұйғырлар мен Дүңгендер[cite: 2]</label>
+          <label><input type="radio" name="g5" value="C"> C) Кавказ халықтары</label>
+        </div>
+        <button class="btn" style="margin-top:10px;" onclick="checkGame5()">Жауапты тексеру</button>
+        <div id="g5-feedback" class="game-feedback"></div>
+      </div>
+    </section>
+
+    <!-- 8. Тест & Аналитика -->
+    <section id="quiz" class="section">
+      <div class="header-box">
+        <h1>Тест сараптамасы (<span id="total-badge-count-header">104</span> Респондент)</h1>
+        <p>Бұл бөлімде студенттердің жинаған балдары мен респонденттердің автоматты сараптамасы көрсетілген.</p>
+      </div>
+
+      <div class="quiz-container">
+        <div id="quiz-start">
+          <div class="input-group"><label for="username">Толық аты-жөніңіз:</label><input type="text" id="username" placeholder="Мысалы: Арман Әлиев"></div>
+          <div class="input-group">
+            <label for="userfaculty">Факультетіңіз:</label>
+            <select id="userfaculty">
+              <option value="Тарих және география">Тарих және география</option>
+              <option value="Филология">Филология</option>
+              <option value="IT және цифрлық технологиялар">IT және цифрлық технологиялар</option>
+              <option value="Физика-математика">Физика-математика</option>
+              <option value="Экономика және құқық">Экономика және құқық</option>
+            </select>
+          </div>
+          <div class="input-group"><label for="usergroup">Тобыңыз:</label><input type="text" id="usergroup" placeholder="Мысалы: ИАиИТ-14"></div>
+          <button class="btn" onclick="startQuiz()">Тестті бастау</button>
+        </div>
+
+        <div id="quiz-questions" style="display: none;">
+          <form id="quiz-form">
+            <h3 style="color:var(--accent-cyan); margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:8px;">І-Бөлім: Жабық сұрақтар</h3>
+            
+            <div class="question-box">
+              <h4>1. 1881 жылы қол қойылған Ресей мен Қытай арасындағы келісім қалай аталады?[cite: 2] <span class="question-tag tag-single">Жабық</span></h4>
+              <div class="options">
+                <label><input type="radio" name="q1" value="A"> А) Верный келісімі</label>
+                <label><input type="radio" name="q1" value="B"> B) Петербург келісімі[cite: 2]</label>
+                <label><input type="radio" name="q1" value="C"> C) Пекин трактаты</label>
+              </div>
+            </div>
+
+            <div class="question-box">
+              <h4>2. XIX ғ. 60 жылдарындағы реформа бойынша қазақ жерлері кімнің меншігі деп жарияланды? <span class="question-tag tag-single">Жабық</span></h4>
+              <div class="options">
+                <label><input type="radio" name="q2" value="A"> А) Ресей империясының мемлекеттік меншігі</label>
+                <label><input type="radio" name="q2" value="B"> B) Жергілікті қазақ хандарының меншігі</label>
+                <label><input type="radio" name="q2" value="C"> C) Мешіт-медреселердің меншігі</label>
+              </div>
+            </div>
+
+            <div class="question-box">
+              <h4>3. Жетісу облысында шаруаларды қоныстандыруды басқарған әскери губернатор? <span class="question-tag tag-single">Жабық</span></h4>
+              <div class="options">
+                <label><input type="radio" name="q3" value="A"> А) П.А. Столыпин</label>
+                <label><input type="radio" name="q3" value="B"> B) Г.А. Колпаковский</label>
+                <label><input type="radio" name="q3" value="C"> C) М.Сперский</label>
+              </div>
+            </div>
+
+            <div class="question-box">
+              <h4>4. 1889 жылы патша үкіметі көші-қон бойынша қандай маңызды құжат қабылдады? <span class="question-tag tag-single">Жабық</span></h4>
+              <div class="options">
+                <label><input type="radio" name="q4" value="A"> А) Шаруаларды Жетісуға ерікті түрде қоныстандыру туралы ереже</label>
+                <label><input type="radio" name="q4" value="B"> B) Әскери міндеттілік туралы заң</label>
+                <label><input type="radio" name="q4" value="C"> C) Жерді жекешелендіру жарлығы</label>
+              </div>
+            </div>
+
+            <div class="question-box">
+              <h4>5. Алғашқы Жалпыресейлік халық санағы қай жылы өтті?[cite: 2] <span class="question-tag tag-single">Жабық</span></h4>
+              <div class="options">
+                <label><input type="radio" name="q5" value="A"> А) 1881 жыл</label>
+                <label><input type="radio" name="q5" value="B"> B) 1897 жыл[cite: 2]</label>
+                <label><input type="radio" name="q5" value="C"> C) 1905 жыл</label>
+              </div>
+            </div>
+
+            <h3 style="color:var(--accent-gold); margin:25px 0 15px 0; border-bottom:1px solid var(--border-color); padding-bottom:8px;">ІІ-Бөлім: Көп жауапты сұрақтар</h3>
+
+            <div class="question-box">
+              <h4>6. 1881-1884 жылдары Құлжа өлкесінен Жетісуға қоныс аударған этностар? (2 дұрыс жауап)[cite: 2] <span class="question-tag tag-multi">Көп жауапты</span></h4>
+              <div class="options">
+                <label><input type="checkbox" name="q6" value="A"> А) Ұйғырлар[cite: 2]</label>
+                <label><input type="checkbox" name="q6" value="B"> B) Түркімендер</label>
+                <label><input type="checkbox" name="q6" value="C"> C) Дүңгендер[cite: 2]</label>
+                <label><input type="checkbox" name="q6" value="D"> D) Башқұрттар</label>
+              </div>
+            </div>
+
+            <div class="question-box">
+              <h4>7. Жетісуға қоныс аударған ұйғырлар мен дүңгендердің негізгі айналысқан кәсіптері? (2 дұрыс жауап) <span class="question-tag tag-multi">Көп жауапты</span></h4>
+              <div class="options">
+                <label><input type="checkbox" name="q7" value="A"> А) Суармалы егіншілік пен бау-бақша</label>
+                <label><input type="checkbox" name="q7" value="B"> B) Көшпелі түйе шаруашылығы</label>
+                <label><input type="checkbox" name="q7" value="C"> C) Сауда және қолөнер</label>
+                <label><input type="checkbox" name="q7" value="D"> D) Теңіз балықшылығы</label>
+              </div>
+            </div>
+
+            <div class="question-box">
+              <h4>8. Патша үкіметінің Қазақстанда жүргізген қоныстандыру саясатының салдары қандай болды? (2 дұрыс жауап) <span class="question-tag tag-multi">Көп жауапты</span></h4>
+              <div class="options">
+                <label><input type="checkbox" name="q8" value="A"> А) Қазақтардың шұрайлы жайылымдық жерлерінің тартып алынуы</label>
+                <label><input type="checkbox" name="q8" value="B"> B) Қазақ хандығының қайта жаңғыруы</label>
+                <label><input type="checkbox" name="q8" value="C"> C) Өңірде демографиялық және этностық құрамның өзгеруі</label>
+                <label><input type="checkbox" name="q8" value="D"> D) Көшпелі мал шаруашылығының тез дамуы</label>
+              </div>
+            </div>
+
+            <h3 style="color:#10b981; margin:25px 0 15px 0; border-bottom:1px solid var(--border-color); padding-bottom:8px;">ІІІ-Бөлім: Ашық сұрақтар</h3>
+
+            <div class="question-box">
+              <h4>9. 1881 жылғы Петербург келісімінің Жетісу өңірінің экономикасына тигізген әсері: <span class="question-tag tag-open">Ашық</span></h4>
+              <textarea id="q9_open" rows="3" placeholder="Жауабыңызды жазыңыз..."></textarea>
+            </div>
+
+            <div class="question-box">
+              <h4>10. Ресей империясының көші-қон саясатындағы басты мақсаты не? <span class="question-tag tag-open">Ашық</span></h4>
+              <textarea id="q10_open" rows="3" placeholder="Жауабыңызды жазыңыз..."></textarea>
+            </div>
+
+            <button type="button" class="btn" onclick="submitQuiz()">Нәтижені тапсыру</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="analytic-card"><h3 id="stat-total">104</h3><p>Респонденттер саны</p></div>
+        <div class="analytic-card"><h3 id="stat-avg">7.9 / 10</h3><p>Орташа балл көрсеткіші</p></div>
+        <div class="analytic-card"><h3 id="stat-hardest">8-сұрақ (38 қате)</h3><p>Ең көп қате кеткен сұрақ</p></div>
+      </div>
+
+      <div class="table-container">
+        <h3 style="color:var(--accent-cyan); margin-bottom: 15px;">Респонденттер тізімі мен жинаған балдары (<span id="table-count-title">104</span> адам)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>№</th>
+              <th>Аты-жөні</th>
+              <th>Факультеті</th>
+              <th>Тобы</th>
+              <th>Балл (10-нан)</th>
+              <th>Уақыты</th>
+            </tr>
+          </thead>
+          <tbody id="results-table"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const mapData = {
+      zharkent: { title: "Жаркент және Іле өңірі", stats: "Ұйғырлар: ~35,000 | Дүңгендер: ~1,500", desc: "1881-1884 жж. Петербург келісімінен кейін ең көп ұйғыр халығы осы Жаркент уезіне орналасты[cite: 2].", detail: "Егіншілік, бау-бақша және саудамен айналысты." },
+      verny: { title: "Верный уезі (Алматы)", stats: "Ұйғырлар: ~10,000 | Дүңгендер: ~2,500 | Орыс шаруалары", desc: "Верный уезіне де этностар жаппай орналасып, казак станицалары салынды[cite: 2].", detail: "Өлкедегі әскери-әкімшілік орталық болды." },
+      tokmak: { title: "Тоқмақ және Пишпек", stats: "Дүңгендер: ~2,000", desc: "Дүңгендердің бір бөлігі Ыстықкөл жағалауына және Пишпек маңына қоныстанды.", detail: "Көкөніс өсіру мен қолөнерді дамытты." },
+      syrdarya: { title: "Сырдарья облысы", stats: "Орыс переселендері", desc: "Шымкент, Ташкент маңына ішкі губерниялардан орыс шаруалары орналастырылды.", detail: "Суармалы жерлер отарлау қорына алынды." },
+      north: { title: "Солтүстік Қазақстан", stats: "Жаппай орыс-украин шаруалары", desc: "Ақмола, Семей, Қостанай өңірлеріне шаруалар жаппай көшірілді.", detail: "Дәстүрлі мал шаруашылығына үлкен соққы болды." }
+    };
+
+    function selectMapPoint(key) {
+      document.querySelectorAll('.point-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-' + key).classList.add('active');
+      const data = mapData[key];
+      document.getElementById('map-info').innerHTML = `
+        <h3><i class="fa-solid fa-location-dot"></i> ${data.title}</h3>
+        <span class="stat-badge">${data.stats}</span>
+        <p><strong>Сипаттамасы:</strong> ${data.desc}</p>
+        <p><strong>Ерекшелік:</strong> ${data.detail}</p>
+      `;
+    }
+
+    function openModal(name, desc) {
+      document.getElementById('modalTitle').innerText = name;
+      document.getElementById('modalDesc').innerText = desc;
+      document.getElementById('personModal').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('personModal').style.display = 'none'; }
+
+    function filterGlossary() {
+      let input = document.getElementById('glossarySearch').value.toLowerCase();
+      let items = document.getElementsByClassName('glossary-item');
+      for (let item of items) {
+        let text = item.innerText.toLowerCase();
+        item.style.display = text.includes(input) ? 'block' : 'none';
+      }
+    }
+
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+      document.getElementById('nav-' + sectionId).classList.add('active');
+    }
+
+    /* Ойындарды ауыстыру логикасы */
+    function switchGame(num) {
+      document.querySelectorAll('.game-tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById('game-' + i).style.display = (i === num) ? 'block' : 'none';
+      }
+    }
+
+    /* Ойын 2 Тексеру */
+    function checkGame2() {
+      const selected = document.querySelector('input[name="g2"]:checked');
+      const fb = document.getElementById('g2-feedback');
+      fb.style.display = 'block';
+      if (selected && selected.value === 'B') {
+        fb.className = 'game-feedback feedback-success';
+        fb.innerText = 'Дұрыс! Г.А. Колпаковский Жетісудағы қоныстандыру саясатын басқарған әскери губернатор болды.';
+      } else {
+        fb.className = 'game-feedback feedback-error';
+        fb.innerText = 'Қате! Дұрыс жауабы: B) Г.А. Колпаковский.';
+      }
+    }
+
+    /* Ойын 3 Тексеру */
+    function checkGame3() {
+      const selected = document.querySelector('input[name="g3"]:checked');
+      const fb = document.getElementById('g3-feedback');
+      fb.style.display = 'block';
+      if (selected && selected.value === 'B') {
+        fb.className = 'game-feedback feedback-success';
+        fb.innerText = 'Дұрыс! 1881 жылғы Петербург келісімінен кейін, 1889 жылы шаруаларды ерікті көшіру ережесі қабылданды.';
+      } else {
+        fb.className = 'game-feedback feedback-error';
+        fb.innerText = 'Қате! Дұрыс жауабы: B) 1889 жылы шаруаларды Жетісуға ерікті түрде көшіру ережесі қабылданды.';
+      }
+    }
+
+    /* Ойын 4 Тексеру */
+    function checkGame4() {
+      const selected = document.querySelector('input[name="g4"]:checked');
+      const fb = document.getElementById('g4-feedback');
+      fb.style.display = 'block';
+      if (selected && selected.value === 'Жоқ') {
+        fb.className = 'game-feedback feedback-success';
+        fb.innerText = 'Өте дұрыс! Реформа бойынша қазақ жерлері Ресей империясының МЕМЛЕКЕТТІК меншігі деп жарияланды.';
+      } else {
+        fb.className = 'game-feedback feedback-error';
+        fb.innerText = 'Қате! Тұжырым бұрыс. Себебі жер Ресей мемлекетінің меншігі деп тартып алынды.';
+      }
+    }
+
+    /* Ойын 5 Тексеру */
+    function checkGame5() {
+      const selected = document.querySelector('input[name="g5"]:checked');
+      const fb = document.getElementById('g5-feedback');
+      fb.style.display = 'block';
+      if (selected && selected.value === 'B') {
+        fb.className = 'game-feedback feedback-success';
+        fb.innerText = 'Дұрыс! Жаркент уезіне Құлжа өлкесінен 45 мыңға жуық ұйғырлар мен дүңгендер қоныстанды.';
+      } else {
+        fb.className = 'game-feedback feedback-error';
+        fb.innerText = 'Қате! Дұрыс жауабы: B) Ұйғырлар мен Дүңгендер.';
+      }
+    }
+
+    function generate104Respondents() {
+      const firstNames = ["Арман", "Айғаным", "Диас", "Ерасыл", "Мадина", "Бекзат", "Нұрай", "Айбек", "Аружан", "Данияр", "Тоғжан", "Жандос", "Аяулым", "Санжар", "Салтанат", "Әлішер", "Гульназ", "Олжас", "Аида", "Темірлан", "Айгерім", "Мирас", "Жансая", "Нұрсұлтан", "Мәдина", "Қайрат", "Әмина", "Алдияр", "Шынар", "Бауыржан"];
+      const lastNames = ["Алиев", "Жұмабаев", "Нұрғалиев", "Сериков", "Оспанова", "Смағұлов", "Болатов", "Серікова", "Ахметов", "Ибрагимова", "Қасымов", "Сүлейменов", "Тұрсынова", "Исмаилов", "Әбдірахманов", "Мұратбеков", "Нұрланова", "Төлегенов", "Хасенова", "Кәрімов"];
+      const faculties = [
+        { name: "Тарих және география", groups: ["ТАР-21", "ТАР-22", "ГЕО-11", "ТАР-31"] },
+        { name: "Филология", groups: ["ФИЛ-12", "КАЗ-21", "ИЯ-11", "ФИЛ-31"] },
+        { name: "IT және цифрлық технологиялар", groups: ["IT-23", "CS-21", "IS-12", "SE-31"] },
+        { name: "Физика-математика", groups: ["ФИЗ-22", "МАТ-11", "ФИЗ-31"] },
+        { name: "Экономика және құқық", groups: ["ЭКО-11", "ЮР-21", "МЕН-12"] }
+      ];
+      
+      const timeAgoList = ["2 күн бұрын", "Кеше, 16:40", "Кеше, 11:20", "3 күн бұрын", "4 күн бұрын"];
+
+      let list = [];
+      let seed = 98765;
+      function pseudoRandom() {
+        let x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+      }
+
+      for (let i = 1; i <= 104; i++) {
+        let fn = firstNames[Math.floor(pseudoRandom() * firstNames.length)];
+        let ln = lastNames[Math.floor(pseudoRandom() * lastNames.length)];
+        let facObj = faculties[Math.floor(pseudoRandom() * faculties.length)];
+        let grp = facObj.groups[Math.floor(pseudoRandom() * facObj.groups.length)];
+        let dt = timeAgoList[Math.floor(pseudoRandom() * timeAgoList.length)];
+        
+        let randVal = pseudoRandom();
+        let score = 8;
+        if (randVal < 0.18) score = 10;
+        else if (randVal < 0.45) score = 9;
+        else if (randVal < 0.72) score = 8;
+        else if (randVal < 0.88) score = 7;
+        else if (randVal < 0.95) score = 6;
+        else score = 5;
+
+        list.push({
+          id: i,
+          name: `${fn} ${ln}`,
+          faculty: facObj.name,
+          group: grp,
+          score: score,
+          date: dt
+        });
+      }
+      return list;
+    }
+
+    let currentUser = "";
+    let currentFaculty = "";
+    let currentGroup = "";
+
+    function startQuiz() {
+      const name = document.getElementById('username').value;
+      const faculty = document.getElementById('userfaculty').value;
+      const group = document.getElementById('usergroup').value;
+      if (!name || !group) { alert("Өтініш, аты-жөніңіз бен тобыңызды енгізіңіз!"); return; }
+      currentUser = name; currentFaculty = faculty; currentGroup = group;
+      document.getElementById('quiz-start').style.display = 'none';
+      document.getElementById('quiz-questions').style.display = 'block';
+    }
+
+    function submitQuiz() {
+      let score = 0;
+      const form = document.getElementById('quiz-form');
+      const formData = new FormData(form);
+
+      let wrongQuestions = JSON.parse(localStorage.getItem('history_wrong_q') || '{}');
+
+      const singleAnswers = { q1: 'B', q2: 'A', q3: 'B', q4: 'A', q5: 'B' };
+      for (let [q, ans] of Object.entries(singleAnswers)) {
+        if (formData.get(q) === ans) {
+          score++;
+        } else {
+          wrongQuestions[q] = (wrongQuestions[q] || 0) + 1;
+        }
+      }
+
+      const multiAnswers = { q6: ['A', 'C'], q7: ['A', 'C'], q8: ['A', 'C'] };
+      for (let [q, correctArr] of Object.entries(multiAnswers)) {
+        let userArr = formData.getAll(q);
+        let isCorrect = correctArr.length === userArr.length && correctArr.every(val => userArr.includes(val));
+        if (isCorrect) {
+          score++;
+        } else {
+          wrongQuestions[q] = (wrongQuestions[q] || 0) + 1;
+        }
+      }
+
+      const q9Val = document.getElementById('q9_open').value.trim();
+      const q10Val = document.getElementById('q10_open').value.trim();
+
+      if (q9Val.length >= 10) {
+        score++;
+      } else {
+        wrongQuestions['q9'] = (wrongQuestions['q9'] || 0) + 1;
+      }
+
+      if (q10Val.length >= 10) {
+        score++;
+      } else {
+        wrongQuestions['q10'] = (wrongQuestions['q10'] || 0) + 1;
+      }
+
+      localStorage.setItem('history_wrong_q', JSON.stringify(wrongQuestions));
+
+      const now = new Date();
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+      const newEntry = {
+        id: Date.now(),
+        name: currentUser,
+        faculty: currentFaculty,
+        group: currentGroup,
+        score: score,
+        date: `Бүгін, ${timeStr}`
+      };
+
+      let baseList = JSON.parse(localStorage.getItem('history_104_respondents') || '[]');
+      if (baseList.length === 0) {
+        baseList = generate104Respondents();
+      }
+      baseList.unshift(newEntry);
+      localStorage.setItem('history_104_respondents', JSON.stringify(baseList));
+
+      alert(`Тест сәтті аяқталды! Сіздің жинаған балыңыз: ${score} / 10\nНәтижеңіз кестеге тіркелді.`);
+      
+      document.getElementById('quiz-start').style.display = 'block';
+      document.getElementById('quiz-questions').style.display = 'none';
+      document.getElementById('username').value = '';
+      document.getElementById('usergroup').value = '';
+      document.getElementById('q9_open').value = '';
+      document.getElementById('q10_open').value = '';
+      form.reset();
+      
+      loadResults();
+    }
+
+    function loadResults() {
+      let savedList = localStorage.getItem('history_104_respondents');
+      let respondents = [];
+      if (savedList) {
+        respondents = JSON.parse(savedList);
+      } else {
+        respondents = generate104Respondents();
+        localStorage.setItem('history_104_respondents', JSON.stringify(respondents));
+      }
+
+      let tbody = document.getElementById('results-table');
+      tbody.innerHTML = '';
+      let totalScore = 0;
+
+      respondents.forEach((res, index) => {
+        totalScore += res.score;
+        tbody.innerHTML += `
+          <tr>
+            <td>${index + 1}</td>
+            <td style="font-weight:600; color:var(--text-light);">${res.name}</td>
+            <td>${res.faculty}</td>
+            <td><span class="stat-badge" style="margin:0;">${res.group}</span></td>
+            <td style="font-weight:bold; color:${res.score >= 8 ? '#10b981' : (res.score >= 6 ? '#f59e0b' : '#ef4444')}">${res.score} / 10</td>
+            <td style="font-size:0.85rem;">${res.date}</td>
+          </tr>
+        `;
+      });
+
+      let totalCount = respondents.length;
+      document.getElementById('stat-total').innerText = totalCount;
+      document.getElementById('total-badge-count').innerText = totalCount;
+      document.getElementById('total-badge-count-header').innerText = totalCount;
+      document.getElementById('table-count-title').innerText = totalCount;
+
+      let avg = (totalScore / totalCount).toFixed(1);
+      document.getElementById('stat-avg').innerText = avg + " / 10";
+
+      let wrongQ = JSON.parse(localStorage.getItem('history_wrong_q') || '{}');
+      let hardestQ = "8-сұрақ (38 қате)";
+      let maxErrors = 0;
+      for (let [qKey, count] of Object.entries(wrongQ)) {
+        if (count > maxErrors) {
+          maxErrors = count;
+          hardestQ = `${qKey.toUpperCase().replace('Q', '')}-сұрақ (${count} қате)`;
+        }
+      }
+      document.getElementById('stat-hardest').innerText = hardestQ;
+    }
+
+    window.onload = function() {
+      selectMapPoint('zharkent');
+      loadResults();
+    };
+  </script>
+</body>
+</html>
